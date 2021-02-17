@@ -14,7 +14,7 @@ import org.koin.android.ext.android.inject
 
 class LookUpFragment : Fragment() {
 
-    val weatherViewModel: WeatherViewModel by inject()
+    private val weatherViewModel: WeatherViewModel by inject()
     private var _binding: FragmentLookUpBinding? = null
     private val binding get() = _binding!!  //read only variable
     override fun onCreateView(

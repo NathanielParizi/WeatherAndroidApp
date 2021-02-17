@@ -5,16 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import android.widget.Toast.LENGTH_LONG
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.weatherandroid.Model.Forecast
 import com.example.weatherandroid.ViewModels.WeatherViewModel
 import com.example.weatherandroid.databinding.FragmentWeatherListBinding
 import org.koin.android.viewmodel.ext.android.sharedViewModel
+import org.koin.core.component.KoinApiExtension
 
 
+@KoinApiExtension
 class WeatherListFragment : Fragment() {
 
     private val weatherViewModel: WeatherViewModel by sharedViewModel()
@@ -63,7 +63,6 @@ class WeatherListFragment : Fragment() {
         })
 
         listView.setOnItemClickListener { _, _, position, _ ->
-            Toast.makeText(requireContext(), listItems[position], LENGTH_LONG).show()
             findNavController().navigate(R.id.action_weatherListFragment_to_detailsFragment,
                 Bundle().apply {
                     putString("position", position.toString())
@@ -75,7 +74,6 @@ class WeatherListFragment : Fragment() {
             findNavController().popBackStack()
         }
     }
-
 
 
 }

@@ -12,7 +12,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class DetailsFragment : Fragment() {
 
-    val weatherViewModel: WeatherViewModel by sharedViewModel()
+    private val weatherViewModel: WeatherViewModel by sharedViewModel()
 
     private var _binding: FragmentDetailsBinding? = null
     private val binding get() = _binding!!  //read only variable

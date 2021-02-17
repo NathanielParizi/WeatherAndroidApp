@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.viewmodel.dsl.viewModel
+import org.koin.core.component.KoinApiExtension
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -15,6 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.text.DateFormat
 import java.util.concurrent.TimeUnit
 
+@OptIn(KoinApiExtension::class)
 val appModule = module {
 
     viewModel { WeatherViewModel() }
