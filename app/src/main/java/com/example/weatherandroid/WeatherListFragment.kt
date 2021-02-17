@@ -1,7 +1,6 @@
 package com.example.weatherandroid
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,20 +8,20 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
+import com.example.weatherandroid.Model.Forecast
 import com.example.weatherandroid.ViewModels.WeatherViewModel
 import com.example.weatherandroid.databinding.FragmentWeatherListBinding
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-private const val TAG = "WeatherListFragment"
 
 class WeatherListFragment : Fragment() {
 
-    val weatherViewModel: WeatherViewModel by sharedViewModel()
-    var listItems = arrayListOf<String>()
-    var listMap = HashMap<String, Double>()
-    var keyList = ArrayList<String>()
-    var ValueList = ArrayList<Double>()
+    private val weatherViewModel: WeatherViewModel by sharedViewModel()
+    private var listItems = arrayListOf<String>()
+    private var listMap = HashMap<String, Forecast>()
+    private var keyList = ArrayList<String>()
+    private var valueList = ArrayList<Forecast>()
 
 
     private var _binding: FragmentWeatherListBinding? = null
@@ -30,7 +29,7 @@ class WeatherListFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentWeatherListBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -40,50 +39,43 @@ class WeatherListFragment : Fragment() {
 
         val city = arguments?.getString("city")
         val listView = binding.listview
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listItems)
+        val adapter = ArrayAdapter(requireContext(), R.layout.row_textview, listItems)
         listView.adapter = adapter
-
-        Log.d(TAG, "outside: ${city}")
-
         city?.let { weatherViewModel.basicCoroutineFetch(it) }
-
-
-        weatherViewModel.weatherListLiveData.observe(viewLifecycleOwner, Observer {
+        weatherViewModel.weatherListLiveData.observe(viewLifecycleOwner, { it ->
             it.list.forEach {
 
                 listItems.add("${it.weather[0].main}  ${it.main.temp}")
-                Log.d(
-                    TAG,
-                    "this is my list: ${it.weather[0].main}  and   ${kelvinToFarenheit(it.main.temp)}"
-                )
-                listMap.put(it.weather[0].main, it.main.temp)
-
+                listMap[it.weather[0].main] = it
                 keyList = ArrayList(listMap.keys)
-                ValueList = ArrayList(listMap.values)
+                valueList = ArrayList(listMap.values)
                 listItems.clear()
-                for (i in 0..keyList.size-1) {
-                    listItems.add(keyList[i] + " " + ValueList[i])
+                for (i in 0 until keyList.size) {
+                    listItems.add(
+                        keyList[i] + " \t Temp: " + weatherViewModel.kelvinToFarenheit(
+                            valueList[i].main.temp
+                        )
+                    )
                 }
-                listItems.forEach {
-                    Log.d(TAG, "onViewCreated: ${listItems}")
-                }
-
             }
-
+            weatherViewModel.detailsData.value = valueList
             adapter.notifyDataSetChanged()
         })
 
-        listView.setOnItemClickListener { parent, view, position, id ->
-            Toast.makeText(requireContext(), listItems[position].toString(), LENGTH_LONG).show()
+        listView.setOnItemClickListener { _, _, position, _ ->
+            Toast.makeText(requireContext(), listItems[position], LENGTH_LONG).show()
+            findNavController().navigate(R.id.action_weatherListFragment_to_detailsFragment,
+                Bundle().apply {
+                    putString("position", position.toString())
+                })
         }
 
-//            findNavController().navigate(R.id.action_weatherListFragment_to_detailsFragment)
-
+        binding.topAppBar.setNavigationOnClickListener {
+            // back button pressed
+            findNavController().popBackStack()
+        }
     }
 
-    private fun kelvinToFarenheit(value: Double): Double {
-        var farenheit = value * 1.8 - 459.67
-        return farenheit
-    }
+
 
 }

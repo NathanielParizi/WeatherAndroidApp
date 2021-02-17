@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherandroid.DataSource.Remote.API_KEY
 import com.example.weatherandroid.DataSource.Remote.WeatherRepository
+import com.example.weatherandroid.Model.Forecast
 import com.example.weatherandroid.Model.WeatherApiResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
@@ -21,6 +22,8 @@ class WeatherViewModel : ViewModel(), KoinComponent {
     val service: WeatherRepository by inject()
     var responseError = ""
     var userCity = MutableLiveData<String>()
+
+    var detailsData = MutableLiveData<ArrayList<Forecast>>()
 
     private val weatherListMutableLiveData = MutableLiveData<WeatherApiResponse>()
     val weatherListLiveData: LiveData<WeatherApiResponse>
@@ -40,7 +43,12 @@ class WeatherViewModel : ViewModel(), KoinComponent {
 //        Log.d("TAG", "onError: $message")
     }
 
-    fun basicCoroutineFetch(city : String) {
+    fun kelvinToFarenheit(value: Double): Double {
+        var farenheit = value * 1.8 - 459.67
+        return String.format("%.2f", farenheit).toDouble()
+    }
+
+    fun basicCoroutineFetch(city: String) {
 
         viewModelScope.launch {
 
